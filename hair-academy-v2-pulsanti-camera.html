@@ -1,0 +1,184 @@
+<!doctype html><html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>HAIR ACADEMY - stefano gorga</title><style>:root{font-family:system-ui,Arial;background:#101724;color:#f6f8fc}body{margin:0;padding:24px}main{max-width:850px;margin:auto}h1{margin-bottom:4px}p{line-height:1.55;color:#c7d2e3}.panel{background:#1c293c;border:1px solid #38485f;border-radius:18px;padding:18px;margin-top:18px}video{width:100%;aspect-ratio:16/9;background:#03070e;border-radius:12px;object-fit:contain}button{border:0;border-radius:10px;padding:13px 17px;background:#e7bb77;color:#152034;font-weight:750;cursor:pointer;margin:4px}button.secondary{background:#354963;color:white}button:disabled{opacity:.4;cursor:not-allowed}.status{font-weight:650;color:#e7bb77}.tip{font-size:14px}a{color:#f3c789} .controls{display:flex;flex-wrap:wrap;margin-top:12px}</style><script>if(!new URLSearchParams(location.search).has('phone'))document.documentElement.classList.add('academy-locked');</script><style>html.academy-locked body>main{display:none}#academy-login{display:none}html.academy-locked #academy-login{display:flex}#academy-login{position:fixed;inset:0;z-index:99999;background:#101724;align-items:center;justify-content:center;padding:22px}#academy-login .login-card{background:#1c293c;border:1px solid #38485f;border-radius:18px;padding:30px;max-width:410px;width:100%;text-align:center;box-sizing:border-box}#academy-login input{box-sizing:border-box;width:100%;background:#101724;border:1px solid #61718a;color:#fff;padding:14px;border-radius:9px;font-size:16px}#academy-login button{width:100%;margin:15px 0 0}#academy-login .login-error{color:#ffaaa9;min-height:24px;font-size:14px}</style>
+<style>
+/* Stato dei comandi: persistente finché il PC rimane nella modalità indicata. */
+#studio .controls button, #phoneBtns button {transition:background .18s ease,color .18s ease,box-shadow .18s ease,border-color .18s ease,transform .18s ease}
+#studio .controls button.is-active, #phoneBtns button.is-active {opacity:1!important; color:white!important; border:1px solid rgba(255,255,255,.5)!important; box-shadow:0 0 0 2px rgba(255,255,255,.22),0 0 23px rgba(255,255,255,.18);transform:translateY(-1px)}
+#studio #rec.is-active, #phoneBtns [data-command="rec"].is-active {background:#df3547!important;box-shadow:0 0 0 2px rgba(255,108,114,.28),0 0 22px rgba(234,62,73,.72)!important}
+#studio #stop.is-active, #phoneBtns [data-command="stop"].is-active {background:#c78228!important;box-shadow:0 0 0 2px rgba(255,187,91,.25),0 0 20px rgba(231,166,75,.55)!important}
+#studio #replay.is-active, #phoneBtns [data-command="replay"].is-active {background:#7943cb!important;box-shadow:0 0 0 2px rgba(174,125,255,.25),0 0 22px rgba(140,92,231,.65)!important}
+#studio #live.is-active, #phoneBtns [data-command="live"].is-active {background:#237b60!important;box-shadow:0 0 0 2px rgba(94,237,181,.2),0 0 22px rgba(48,191,136,.55)!important}
+#studio #save.is-flashing, #phoneBtns [data-command="save"].is-flashing {background:#286fc2!important;color:white!important;opacity:1!important;box-shadow:0 0 0 2px rgba(128,188,255,.25),0 0 20px rgba(63,145,244,.7)!important}
+#phoneBtns .is-pending {outline:2px solid #fff7bf;outline-offset:2px}
+/* Videocamera a tutta altezza, con comandi sovrapposti come in una camera app. */
+body.phone-mode {background:#020509;margin:0!important;padding:0!important;overflow:hidden!important;overscroll-behavior:none}
+body.phone-mode #academy-login {display:none!important}
+#phoneStage {position:fixed;inset:0;height:100vh;height:100dvh;width:100%;background:#03060b;overflow:hidden}
+#phoneCamera {position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+#phoneTop {position:absolute;z-index:4;top:0;left:0;right:0;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px 46px;background:linear-gradient(180deg,rgba(4,9,16,.9),rgba(4,9,16,.55) 65%,transparent);pointer-events:none}
+#phoneBrand {font-weight:850;letter-spacing:.08em;font-size:13px;color:#f5c884;text-shadow:0 1px 5px #000}
+#conn {display:inline-flex;margin-top:8px;font-size:12px;font-weight:650;color:white;background:rgba(15,24,37,.82);padding:8px 12px;border-radius:999px;max-width:100%;box-sizing:border-box;overflow-wrap:anywhere}
+#phoneBottom {position:absolute;z-index:4;bottom:0;left:0;right:0;padding:38px 12px calc(env(safe-area-inset-bottom,0px) + 13px);background:linear-gradient(0deg,rgba(4,9,16,.98),rgba(4,9,16,.87) 60%,transparent);pointer-events:none}
+#phoneBtns {pointer-events:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:min(100%,620px);margin:0 auto}
+#phoneBtns button {border:1px solid rgba(255,255,255,.15);margin:0;padding:15px 7px;min-height:57px;border-radius:13px;background:rgba(47,61,82,.9);color:#fff;font-weight:800;font-size:12px;line-height:1.2;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;backdrop-filter:blur(12px)}
+#phoneBtns button[data-command="rec"] {grid-column:span 2;background:rgba(133,44,58,.94);font-size:15px}
+#phoneBtns button:disabled:not(.is-active) {opacity:.48;cursor:not-allowed}
+#phoneHint {pointer-events:none;text-align:center;margin:10px 0 0;font-size:11px;color:#aebacb;text-shadow:0 1px 3px #000}
+@media (orientation:landscape) and (max-height:550px) {
+ #phoneTop {padding:calc(env(safe-area-inset-top,0px) + 5px) 12px 24px}
+ #phoneBottom {padding:20px 10px calc(env(safe-area-inset-bottom,0px) + 5px)}
+ #phoneBtns {max-width:600px;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+ #phoneBtns button {min-height:42px;padding:8px 5px;font-size:11px}
+ #phoneBtns button[data-command="rec"] {grid-column:auto;font-size:12px}
+ #phoneHint {margin:4px 0 0}
+}
+</style></head><body><main><h1>HAIR ACADEMY - stefano gorga</h1><p>Uno specchietto Picture-in-Picture per il video dal telefono e per il replay in loop, sopra la presentazione Canva originale.</p><div class="panel"><div id="studio"><video id="screen" autoplay playsinline muted></video><div class="controls"><button id="connect">1 · Collega scheda VDO.Ninja</button><button id="pip" class="secondary" disabled>2 · Apri PiP con comandi</button><button id="rec" disabled>● REGISTRA</button><button id="stop" class="secondary" disabled>■ STOP</button><button id="replay" class="secondary" disabled>↻ REPLAY LOOP</button><button id="live" class="secondary" disabled>◉ TORNA LIVE</button><button id="save" class="secondary" disabled>↓ SALVA CLIP</button></div><p class="status" id="status" role="status">Pronto. Apri prima il link VIEW di VDO.Ninja in una scheda Chrome.</p></div></div><div class="panel"><strong>Telecomando iPhone (sperimentale)</strong><p class="tip">Apri questa pagina sul PC. Premi «Attiva telecomando» e apri sull’iPhone il link generato. Su iPhone vedrai la fotocamera VDO.Ninja incorporata e i pulsanti. PC e iPhone possono usare reti differenti. Serve Internet per Firebase e VDO.Ninja. I comandi mostrano la modalità attiva su PC e telefono.</p><button id="remoteStart">Attiva telecomando iPhone</button><div id="remoteInfo" class="tip" style="overflow-wrap:anywhere"></div></div><div class="panel"><strong>Come si usa</strong><p class="tip">1. Apri il link VIEW di VDO.Ninja in un'altra scheda e avvia il video del cellulare. 2. Torna qui e premi «Collega scheda VDO.Ninja». Nel selettore di Chrome scegli <b>Scheda Chrome</b>, seleziona VDO.Ninja e premi <b>Condividi</b>. 3. Premi «Apri specchietto PiP», poi torna a Canva. 4. Registra una tecnica, premi STOP e poi REPLAY LOOP. Il replay sostituisce il live nello stesso specchietto. 5. Per tornare alla ripresa premi TORNA LIVE.</p><p class="tip">I comandi REGISTRA, STOP, REPLAY, LIVE e SALVA sono disponibili direttamente nello specchietto flottante. Dopo un clic nello specchietto, se il telecomando non risponde, clicca una volta sulla presentazione Canva per ridarle il focus. <b>Non interrompere la condivisione della scheda VDO.Ninja</b> mentre lavori. Se il video appare nero, assicurati che VDO.Ninja stia riproducendo il live.</p><p class="tip">Questa versione usa Document Picture-in-Picture, non il PiP video tradizionale. Il browser richiede un clic per aprirlo; non può essere riaperto automaticamente. Il comportamento sopra Canva a schermo intero va verificato. Le clip vengono elaborate localmente nel browser, senza invio a server.</p></div></main><div id="academy-login"><form class="login-card" id="academy-login-form"><h1>Hair Academy</h1><p>Inserisci la password per accedere</p><input type="password" id="academy-password" placeholder="Password" autocomplete="off" required><button type="submit">ENTRA</button><p class="login-error" id="academy-login-error" role="alert"></p></form></div><script>(function(){const form=document.getElementById('academy-login-form');if(!form)return;form.addEventListener('submit',function(e){e.preventDefault();const input=document.getElementById('academy-password');if(input.value==='STEFANO GORGA'){document.documentElement.classList.remove('academy-locked');input.value='';document.getElementById('academy-login-error').textContent='';}else{document.getElementById('academy-login-error').textContent='Password non corretta';input.value='';input.focus();}});})();</script><script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js';
+import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js';
+import { getDatabase, ref, set, onValue, onDisconnect } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js';
+const firebaseConfig={apiKey:'AIzaSyBTKlrNhux2PoR0gohNrqitxJl2i3jSKI0',authDomain:'stefano-gorga.firebaseapp.com',databaseURL:'https://stefano-gorga-default-rtdb.europe-west1.firebasedatabase.app',projectId:'stefano-gorga',appId:'1:237897897524:web:652b65144fe7a081b0dc61'};
+const app=initializeApp(firebaseConfig), auth=getAuth(app), db=getDatabase(app);
+const qs=new URLSearchParams(location.search), session=qs.get('phone');
+if(session){
+ document.body.classList.add('phone-mode');
+ document.body.innerHTML=`<div id="phoneStage">
+  <iframe id="phoneCamera" title="Videocamera VDO.Ninja" allow="camera;microphone;autoplay;fullscreen" src="https://vdo.ninja/?push=${encodeURIComponent(qs.get('stream')||'')}&webcam&autostart"></iframe>
+  <div id="phoneTop"><div id="phoneBrand">HAIR ACADEMY · stefano gorga</div><div id="conn" role="status">Connessione in corso…</div></div>
+  <div id="phoneBottom"><div id="phoneBtns" aria-label="Comandi del telecomando"></div><p id="phoneHint">Tocca il video per avviare la fotocamera · Non bloccare lo schermo</p></div>
+ </div>`;
+ const conn=document.getElementById('conn'), cmds=[['rec','● REGISTRA'],['stop','■ STOP'],['replay','↻ REPLAY LOOP'],['live','◉ TORNA LIVE'],['save','↓ SALVA SUL PC']];
+ const buttons={},pending=new Map();let ready=false, pcState=null,flashTimer;
+ function paintPhone(){
+  const a=pcState||{},active=ready?a.mode:'idle';
+  for(const [id] of cmds){
+   const b=buttons[id]; b.classList.toggle('is-active',active===id);
+   b.setAttribute('aria-pressed',active===id?'true':'false');
+   const enabled=ready&&!!pcState&&(
+    id==='rec'?a.connected&&!a.recording:
+    id==='stop'?a.recording:
+    id==='replay'?a.hasClip&&!a.recording:
+    id==='live'?a.connected&&!a.recording:
+    id==='save'?a.hasClip:false);
+   b.disabled=!enabled;
+  }
+ }
+ function flashSave(){buttons.save.classList.add('is-flashing');clearTimeout(flashTimer);flashTimer=setTimeout(()=>buttons.save.classList.remove('is-flashing'),1500)}
+ for(const [id,label] of cmds){
+  const button=document.createElement('button');buttons[id]=button;
+  button.textContent=label;button.dataset.command=id;button.disabled=true;
+  button.onclick=async()=>{
+   if(!ready){conn.textContent='PC non connesso';return;}
+   const key=crypto.randomUUID();pending.set(key,{id,label});
+   button.classList.add('is-pending');conn.textContent='Invio '+label+'…';
+   try{await set(ref(db,`sessions/${session}/command`),{id:key,command:id,at:Date.now()});}
+   catch(e){pending.delete(key);button.classList.remove('is-pending');conn.textContent='Errore invio: '+e.message;}
+  };
+  document.getElementById('phoneBtns').append(button);
+ }
+ try{
+  await signInAnonymously(auth);
+  onValue(ref(db,`sessions/${session}/meta`),snap=>{
+   ready=snap.exists();if(!ready)pcState=null;
+   conn.textContent=ready?'● Collegato al PC':'PC non connesso / sessione terminata';paintPhone();
+  },e=>conn.textContent='Errore connessione: '+e.message);
+  onValue(ref(db,`sessions/${session}/ack`),snap=>{
+   const a=snap.val();if(!a)return;
+   if(typeof a.mode==='string'){
+    pcState={mode:a.mode,connected:!!a.connected,recording:!!a.recording,hasClip:!!a.hasClip};paintPhone();
+   }
+   if(a.id&&pending.has(a.id)){
+    const p=pending.get(a.id);buttons[p.id].classList.remove('is-pending');
+    conn.textContent=a.ok?'✓ '+p.label+' eseguito':'Comando non eseguito: '+a.message;
+    if(a.ok&&p.id==='save')flashSave();
+    pending.delete(a.id);
+   }
+  },e=>conn.textContent='Errore conferma: '+e.message);
+ }catch(e){conn.textContent='Errore accesso Firebase: '+e.message;}
+
+}else{
+ window.HairFirebase={db,ref,set,onValue,onDisconnect,signIn:()=>signInAnonymously(auth)};
+ window.dispatchEvent(new Event('hair-firebase-ready'));
+}
+</script><script>
+if(!new URLSearchParams(location.search).has('phone')){
+let pipWindow=null;const $=id=>document.getElementById(id)||pipWindow?.document.getElementById(id);const video=$('screen');let stream=null,recorder=null,chunks=[],blob=null,blobURL=null,recording=false,mode='live',stopped=false,stopping=false;let fileType='video/webm';let remoteStatePublisher=null;
+const say=s=>$('status').textContent=s;
+function getState(){
+ const connected=!!stream&&stream.getVideoTracks().some(t=>t.readyState==='live');
+ const active=stopped?'stop':recording?'rec':mode==='replay'?'replay':connected?'live':'idle';
+ return {mode:active,connected,recording,hasClip:!!blob};
+}
+function ui(){
+ const state=getState(),connected=state.connected;
+ $('pip').disabled=(!connected&&!blob)||!!(pipWindow&&!pipWindow.closed);
+ $('rec').disabled=!connected||recording||stopping;
+ $('stop').disabled=!recording||stopping;
+ $('replay').disabled=!blob||recording||stopping;
+ $('live').disabled=!connected||recording||stopping;
+ $('save').disabled=!blob;
+ $('connect').disabled=recording||stopping;
+ for(const id of ['rec','stop','replay','live']){
+  const button=$(id);button.classList.toggle('is-active',state.mode===id);
+  button.setAttribute('aria-pressed',state.mode===id?'true':'false');
+ }
+ if(remoteStatePublisher)remoteStatePublisher();
+} 
+async function showLive(){if(!stream)throw Error('Connetti prima VDO.Ninja');mode='live';stopped=false;video.pause();video.removeAttribute('src');video.srcObject=stream;video.muted=true;video.loop=false;await video.play();ui();}
+async function showReplay(){if(!blob)throw Error('Nessuna clip registrata');mode='replay';stopped=false;video.pause();video.srcObject=null;video.src=blobURL;video.loop=true;video.muted=true;await video.play();ui();}
+$('connect').onclick=async()=>{try{if(!navigator.mediaDevices?.getDisplayMedia)throw Error('Apri la pagina pubblicata su HTTPS in Chrome');const s=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:30},audio:false,preferCurrentTab:false});stream?.getTracks().forEach(t=>t.stop());stream=s;stream.getVideoTracks()[0].addEventListener('ended',()=>{say('Condivisione interrotta: collega nuovamente VDO.Ninja.');ui();});await showLive();say('LIVE collegato. Apri lo specchietto PiP.');}catch(e){say('Connessione non riuscita: '+e.message);}ui();};
+$('pip').onclick=async()=>{try{
+ if(!('documentPictureInPicture' in window))throw Error('Document Picture-in-Picture non supportato: usa Chrome desktop aggiornato e apri il sito in HTTPS.');
+ if(pipWindow&&!pipWindow.closed){pipWindow.focus();return;}
+ pipWindow=await documentPictureInPicture.requestWindow({width:420,height:285});
+ const css=`*{box-sizing:border-box}body{margin:0;padding:9px;background:#101724;color:#f6f8fc;font:13px system-ui,Arial}#studio{display:flex;flex-direction:column;gap:5px}video{width:100%;height:auto;max-height:calc(100vh - 77px);min-height:0;object-fit:contain;background:#03070e;border-radius:8px}.controls{display:flex;flex-wrap:wrap;gap:5px}button{border:0;border-radius:7px;padding:8px 10px;background:#e7bb77;color:#152034;font-weight:750;cursor:pointer;font-size:12px}button.secondary{background:#354963;color:white}button:disabled{opacity:.4;cursor:not-allowed}button.is-active{opacity:1!important;color:white!important;box-shadow:0 0 0 2px rgba(255,255,255,.25),0 0 18px rgba(255,255,255,.2)}#rec.is-active{background:#df3547}#stop.is-active{background:#c78228}#replay.is-active{background:#7943cb}#live.is-active{background:#237b60}#save.is-flashing{background:#286fc2;color:white!important;opacity:1!important;box-shadow:0 0 18px #286fc2}#connect,#pip{display:none}.status{display:none}`;
+ const style=pipWindow.document.createElement('style');style.textContent=css;pipWindow.document.head.append(style);
+ pipWindow.document.title='Hair Academy · LIVE / REPLAY';
+ pipWindow.document.body.append($('studio'));
+ pipWindow.addEventListener('pagehide',()=>{document.querySelector('.panel').prepend($('studio'));pipWindow=null;ui();},{once:true});
+ say('Specchietto con comandi aperto. Torna a Canva.');ui();
+ }catch(e){say('PiP con comandi non avviato: '+e.message);}};
+$('rec').onclick=async()=>{try{if(!stream)throw Error('Collega prima VDO.Ninja');if(!window.MediaRecorder)throw Error('Registrazione non supportata');await showLive();chunks=[];const candidates=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];fileType=candidates.find(t=>MediaRecorder.isTypeSupported(t))||'';recorder=new MediaRecorder(stream,fileType?{mimeType:fileType}:undefined);recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};recorder.onstop=()=>{stopping=false;if(!chunks.length){say('Nessun dato registrato: verifica la condivisione.');recording=false;ui();return;}blob=new Blob(chunks,{type:recorder.mimeType||'video/webm'});if(blobURL)URL.revokeObjectURL(blobURL);blobURL=URL.createObjectURL(blob);recording=false;say('Clip pronta! Premi REPLAY LOOP per mostrarla nello specchietto.');ui();};recorder.onerror=e=>{stopping=false;stopped=false;say('Errore di registrazione: '+(e.error?.message||'sconosciuto'));recording=false;ui()};recorder.start(500);recording=true;stopped=false;say('● REGISTRAZIONE IN CORSO');ui();}catch(e){say('Impossibile registrare: '+e.message);}};
+$('stop').onclick=()=>{if(recorder?.state==='recording'){stopped=true;stopping=true;recorder.stop();say('Elaborazione clip…');ui();}};
+$('replay').onclick=async()=>{try{await showReplay();say('↻ REPLAY IN LOOP nello stesso specchietto PiP.');}catch(e){say('Replay non riuscito: '+e.message);}};
+$('live').onclick=async()=>{try{await showLive();say('◉ LIVE ripristinato.');}catch(e){say(e.message);}};
+$('save').onclick=()=>{if(!blob)return;const a=document.createElement('a');a.href=blobURL;a.download='hair-academy-'+new Date().toISOString().replace(/[:.]/g,'-')+'.webm';document.body.append(a);a.click();a.remove();const b=$('save');b.classList.add('is-flashing');setTimeout(()=>b.classList.remove('is-flashing'),1500);say('Download clip avviato.');};
+video.addEventListener('enterpictureinpicture',()=>ui());ui();
+ let remoteStarted=false;
+ document.getElementById('remoteStart').onclick=async()=>{
+ const info=document.getElementById('remoteInfo');if(remoteStarted){info.textContent='Telecomando già attivo: riapri il link generato.';return;}
+ const f=window.HairFirebase;if(!f){info.textContent='Firebase non ancora caricato: attendi e riprova.';return;}
+ try{
+ const user=await f.signIn(), id='s'+crypto.randomUUID().replaceAll('-','')+crypto.randomUUID().replaceAll('-','');
+ const streamID='haircam'+crypto.randomUUID().replaceAll('-','').slice(0,16);
+ const root=`sessions/${id}`;
+ await f.set(f.ref(f.db,`${root}/meta`),{owner:user.user.uid,createdAt:Date.now()});
+ f.onDisconnect(f.ref(f.db,`${root}/meta`)).remove().catch(()=>{});
+  // Sincronizza lo stato effettivo del PC con i colori dei pulsanti su iPhone.
+  // Usiamo il nodo ack già autorizzato dalle regole Firebase esistenti.
+  let latestAck={id:'iniziale',ok:true,message:'Stato aggiornato'},stateTimer=null;
+  const publish=async()=>{
+   const state=getState();
+   try{await f.set(f.ref(f.db,`${root}/ack`),{...latestAck,...state,at:Date.now()});}
+   catch(e){console.warn('Impossibile sincronizzare i pulsanti del telecomando:',e);}
+  };
+  remoteStatePublisher=()=>{clearTimeout(stateTimer);stateTimer=setTimeout(publish,110)};
+  remoteStatePublisher();
+ remoteStarted=true;
+ const u=new URL(location.href);u.search='';u.searchParams.set('phone',id);u.searchParams.set('stream',streamID);
+ info.innerHTML='1. Apri su iPhone: <a id="phoneLink" target="_blank" rel="noopener"></a><br>2. Avvia la videocamera VDO.Ninja.<br>3. Apri <a id="viewLink" target="_blank" rel="noopener">VIEW VDO.Ninja</a> sul PC e collega la scheda.<br><strong id="peerState">Telecomando pronto · in attesa di comandi</strong>';
+ const a=document.getElementById('phoneLink');a.href=u.href;a.textContent=u.href;
+ document.getElementById('viewLink').href='https://vdo.ninja/?view='+encodeURIComponent(streamID);
+ let last='';
+ f.onValue(f.ref(f.db,`${root}/command`),async snap=>{const d=snap.val();if(!d||d.id===last||!['rec','stop','replay','live','save'].includes(d.command))return;last=d.id;
+ const b=$(d.command);let ok=!!b&&!b.disabled, message=ok?'Eseguito':'Pulsante non disponibile sul PC: verifica VDO.Ninja o lo stato della registrazione';
+ if(ok){
+  try{await b.onclick();document.getElementById('peerState').textContent='Ultimo comando: '+d.command;}
+  catch(e){ok=false;message=e?.message||'Errore esecuzione';}
+ }
+ latestAck={id:d.id,ok,message};
+ clearTimeout(stateTimer);
+ await publish();
+ },e=>info.textContent='Errore ascolto comandi: '+e.message);
+ }catch(e){info.textContent='Errore attivazione telecomando: '+e.message;}
+ };
+}
+</script></body></html>
